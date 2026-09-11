@@ -96,55 +96,24 @@ _(none)_
 
 ---
 
-## Known Issues (untuk sesi berikutnya)
+## Known Issues
 
-### 🐛 Border color utility class tidak berubah warna
+### ✅ RESOLVED — Border color utility class tidak berubah warna
 
-**Gejala:** Coba pakai `border-red-600`, `border-blue-500`, atau utility color Tailwind lain untuk border → tetap render warna default `var(--border)` (abu-abu muda). Padahal `bg-red-600` dll bekerja normal.
+**Fix applied (2026-09-11):** Wrap universal border rule dalam `@layer base` di `apps/alpha-landing/app/globals.css`:
 
-**Root cause:** Di `apps/alpha-landing/app/globals.css` (sekitar line 106-108):
-
-```css
-* {
-  border-color: var(--border);
-}
-```
-
-Universal selector `*` ini di-declare **setelah** `@import "tailwindcss"`. Karena specificity `*` (0,0,0) dan Tailwind utility class `.border-red-600` (0,1,0) — secara teori utility harus menang. Tapi ternyata **cascade order** memenangkan yang terakhir di-declare di CSS file kalau specificity sama. Hasil: rule `* { border-color: var(--border) }` selalu menang.
-
-**Kenapa `bg-*` aman:** Tidak ada universal selector `* { background-color }` yang override, jadi utility class Tailwind langsung diaplikasikan.
-
-**Fix Options (pilih saat sesi baru):**
-
-**Option A (Recommended)** — Wrap dalam `@layer base` supaya jadi lower priority daripada utilities:
 ```css
 @layer base {
   * {
     border-color: var(--border);
   }
-}
-```
-Karena Tailwind v4 layer order: `theme` → `base` → `components` → `utilities`. Utility class akan menang otomatis.
-
-**Option B** — Pakai `:where()` untuk zero specificity:
-```css
-:where(*) {
-  border-color: var(--border);
+  body { ... }
 }
 ```
 
-**Option C** — Ikuti pola referensi `packages/config-tailwind/theme.css` line 140-143:
-```css
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-}
-```
+Sekarang `border-red-600` dll bekerja normal karena Tailwind v4 layer order (`base` < `utilities`) membuat utility class menang. Verified: build pass.
 
-**Verifikasi:** Setelah fix, coba `<div className="border border-red-600">` — border harus merah, bukan abu-abu.
-
-**Impact:** Tidak block build/lint/typecheck. Cuma limitation styling — developer tidak bisa override border color per-element via utility class.
+**Root cause (arsip):** Universal selector `* { border-color: var(--border) }` sebelumnya di-declare di luar `@layer`, sehingga specificity-nya bersaing langsung dengan utility class dan menang karena cascade order (declared later in file). Fix: bungkus dalam `@layer base` supaya Tailwind v4 layer ordering (`base` < `utilities`) membuat utility class menang otomatis.
 
 ---
 
