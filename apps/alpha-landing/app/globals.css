@@ -1,0 +1,271 @@
+@import "tailwindcss";
+
+/* ============================================
+   LevelUpID Landing — Design Tokens
+   OKLCH neutral base (from shadcn base-nova) + brand overrides.
+   Preserves parity with reference project's theme.css.
+   ============================================ */
+
+:root {
+  /* Base — shadcn OKLCH neutral (identical to reference theme.css) */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+
+  /* Brand — Emerald primary + mint accents (LevelUpID override) */
+  --primary: oklch(0.52 0.13 155);
+  --primary-foreground: oklch(0.985 0.005 150);
+  --ring: oklch(0.6 0.12 155);
+  --radius: 0.75rem;
+
+  --mint: oklch(0.965 0.024 160);
+  --mint-soft: oklch(0.982 0.014 162);
+
+  --muted-foreground: oklch(0.45 0.012 155);
+
+  /* Charts — multi-color ala reference */
+  --chart-1: oklch(0.6 0.14 155);
+  --chart-2: oklch(0.6 0.15 250);
+  --chart-3: oklch(0.6 0.15 300);
+  --chart-4: oklch(0.78 0.14 75);
+  --chart-5: oklch(0.55 0.02 260);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+
+  --primary: oklch(0.72 0.14 152);
+  --primary-foreground: oklch(0.17 0.03 155);
+  --ring: oklch(0.6 0.1 155);
+
+  --mint: oklch(0.24 0.03 160);
+  --mint-soft: oklch(0.2 0.02 160);
+
+  --chart-1: oklch(0.72 0.14 152);
+  --chart-2: oklch(0.7 0.14 250);
+  --chart-3: oklch(0.7 0.14 300);
+  --chart-4: oklch(0.8 0.13 75);
+  --chart-5: oklch(0.65 0.02 260);
+}
+
+/* Map custom tokens to Tailwind utilities via @theme inline */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Blob gradient — mint corner ornament */
+.blob-mint {
+  background: radial-gradient(
+    circle at 100% 100%,
+    color-mix(in oklch, var(--mint) 70%, transparent),
+    transparent 70%
+  );
+}
+
+.bg-mint {
+  background-color: var(--mint);
+}
+.bg-mint-soft {
+  background-color: var(--mint-soft);
+}
+
+/* Heading accent — second line emerald */
+.heading-accent {
+  color: var(--primary);
+}
+
+/* Browser frame — faux window chrome */
+.browser-frame {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  background: var(--card);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.08);
+}
+.browser-frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+}
+.browser-frame-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* FAQ collapsible — smooth height transition */
+.faq-panel {
+  height: 0;
+  overflow: hidden;
+}
+.faq-panel[data-open] {
+  height: var(--collapsible-panel-height);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .faq-panel {
+    transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-rise-in {
+    animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-rise-in-delay-1 {
+    animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+  }
+  .animate-rise-in-delay-2 {
+    animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s
+      cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal-group > * {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s
+      cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-group.is-visible > * {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-group.is-visible > *:nth-child(2) {
+    transition-delay: 0.07s;
+  }
+  .reveal-group.is-visible > *:nth-child(3) {
+    transition-delay: 0.14s;
+  }
+  .reveal-group.is-visible > *:nth-child(4) {
+    transition-delay: 0.21s;
+  }
+  .reveal-group.is-visible > *:nth-child(5) {
+    transition-delay: 0.28s;
+  }
+  .reveal-group.is-visible > *:nth-child(6) {
+    transition-delay: 0.35s;
+  }
+}
+
+/* Hover micro-interactions */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.06);
+}
+
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}

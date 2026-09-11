@@ -151,6 +151,34 @@ BE sebagian ready, sisanya development. Strategi:
 3. **Feature flag** — `NEXT_PUBLIC_USE_MOCK=true` toggle mock vs real API.
 4. Component logic tidak berubah saat switch mock → real.
 
+### 8.1 Ready API Endpoints (Alpha Platform v1)
+
+Base URL: `ALPHA_API_URL` env var. Semua response format: `{ success, message, data, meta: { request_id, timestamp } }`.
+
+**Public — Landing Page:**
+
+| Method | Path | Purpose | Auth |
+|--------|------|---------|------|
+| GET | `/landing/content` | Konten dinamis: stats, testimonials, faqs, cta, site settings | Public |
+| POST | `/landing/leads` | Submit contact form (full_name, email, phone, company_name, message, form_code, utm_*) | Public |
+| POST | `/landing/newsletter` | Subscribe newsletter (email, full_name) | **CF-Access** |
+
+**Public — Registration:**
+
+| Method | Path | Purpose | Auth |
+|--------|------|---------|------|
+| POST | `/register` | Register tenant baru (email, full_name, password, password_confirmation, phone, referral_code?) | **CF-Access** |
+| POST | `/register/resend` | Resend verification link (email) | Public |
+| POST | `/register/verify` | Verify email (token) | Public |
+
+**CF-Access headers** (untuk endpoint di atas):
+- `CF-Access-Client-Id`
+- `CF-Access-Client-Secret`
+
+**Penting:** Endpoint yang butuh CF-Access **HARUS** dipanggil dari server (Next.js Server Action / Route Handler), bukan client. Secret ada di `.env.local`, jangan expose ke browser.
+
+Zod schema response `/landing/content` ada di `packages/types/src/schemas/landing.ts`.
+
 ---
 
 ## 9. Convention & Standards
