@@ -1,0 +1,6 @@
+{
+  "name": "@levelupid/config-typescript",
+  "version": "0.0.1",
+  "private": true,
+  "files": ["tsconfig.json", "tsconfig.nextjs.json", "tsconfig.strict.json"]
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "@levelupid/config-typescript/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "jsxImportSource": "react"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

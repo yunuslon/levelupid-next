@@ -1,0 +1,6 @@
+{
+  "name": "@levelupid/config-biome",
+  "version": "0.0.1",
+  "private": true,
+  "files": ["biome.json"]
+}

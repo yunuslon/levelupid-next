@@ -1,0 +1,6 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  '@biomejs/biome': set this to true or false
+  msw: set this to true or false

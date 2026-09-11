@@ -1,0 +1,17 @@
+{
+  "name": "levelupid-fe",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "biome check --write .",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "@biomejs/biome": "^1.9.4"
+  }
+}
