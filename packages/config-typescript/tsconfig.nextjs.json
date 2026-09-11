@@ -1,8 +1,9 @@
 {
-  "extends": "../config-typescript/tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
-    "jsxImportSource": "react"
+    "jsxImportSource": "react",
+    "isolatedModules": true
   }
 }

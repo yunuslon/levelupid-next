@@ -1,5 +1,7 @@
 export function formatCurrency(amount: number, currency = 'IDR'): string {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency }).format(amount)
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency }).format(
+    amount,
+  )
 }
 
 export function formatDate(date: Date | string): string {

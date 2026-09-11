@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, AxiosError } from 'axios'
+import axios, { type AxiosInstance, type AxiosError } from 'axios'
 
 export interface ApiResponse<T> {
   data: T

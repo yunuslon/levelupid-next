@@ -30,6 +30,9 @@ export function requireAuth<T>(session: T | null): session is T {
   return session !== null
 }
 
-export function requireRole(session: { user: { role: string } }, roles: string[]): boolean {
+export function requireRole(
+  session: { user: { role: string } },
+  roles: string[],
+): boolean {
   return roles.includes(session.user.role)
 }
