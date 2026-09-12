@@ -1,6 +1,6 @@
 # Current State
 
-> Last updated: 2026-09-12 (UI Parity Fixes complete)
+> Last updated: 2026-09-12 (API layer refactor: fetch → axios)
 
 ---
 
@@ -13,6 +13,15 @@ Next: **Phase 1 (Template Integration & Shared UI)** untuk admin apps, atau lanj
 ---
 
 ## Recently Completed
+
+### API Layer Refactor (Alpha Landing) ✅
+
+- ✅ **fetch → axios** — semua Server Actions (`leads.ts`, `newsletter.ts`, `register.ts`) sekarang pakai Axios, konsisten dengan stack yang disepakati (bukan `fetch` native)
+- ✅ **CF-Access headers dipusatkan** — dibuat `app/_lib/alpha-api.ts` dengan 2 instance: `alphaPublicApi` (tanpa CF-Access) & `alphaCFApi` (dengan CF-Access). Sebelumnya headers duplikat di 3 file
+- ✅ **Keputusan: TIDAK enkapsulasi di `packages/api-client`** — alasan: alpha-landing scope kecil (public content + register), CF-Access hanya sementara (development, akan dihapus saat BE lepas Cloudflare Access). `api-client` untuk authenticated APIs (getToken/onUnauthorized) tidak relevan di sini
+- ✅ **Cleanup untuk masa depan** — saat CF-Access dihapus, cukup edit 1 file (`alpha-api.ts`), bukan 3 action files
+- ✅ **Error handling dipertahankan** — tetap map ke `{ ok, message, errors }`, pakai `AxiosError` type guard (bukan `any`) agar lolos Biome
+- ✅ Verified: `pnpm turbo lint typecheck` + `pnpm build` — all pass
 
 ### Alpha Landing Page (Fase A → I) ✅
 
@@ -127,7 +136,7 @@ Sekarang `border-red-600` dll bekerja normal karena Tailwind v4 layer order (`ba
 - **Landing font:** Poppins (via `next/font/google`)
 - **Landing charts:** Recharts direct (skip ChartContainer wrapper, keep simple)
 - **Content strategy:** Mock data dulu di `_content/*.ts`, swap ke API `/landing/content` di iterasi berikutnya
-- **CF-Access secret handling:** Server Actions only (`app/_actions/*.ts`), never expose to browser
+- **CF-Access secret handling:** Server Actions only (`app/_actions/*.ts`), never expose to browser. **Centralized di `app/_lib/alpha-api.ts`** (2026-09-12 refactor)
 - **ISR:** homepage `revalidate = 3600` (1 jam)
 - **Legal pages:** Copy dari reference project (placeholder, edit final di kemudian hari)
 

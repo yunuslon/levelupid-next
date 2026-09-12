@@ -1,6 +1,7 @@
 'use server'
 
-import { getEnv } from '../_lib/env'
+import { AxiosError } from 'axios'
+import { alphaCFApi } from '../_lib/alpha-api'
 
 export type RegisterResult = {
   ok: boolean
@@ -31,31 +32,22 @@ export async function registerTenant(data: {
   referral_code?: string
 }): Promise<RegisterResult> {
   try {
-    const res = await fetch(`${getEnv('ALPHA_API_URL')}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'CF-Access-Client-Id': getEnv('CF_ACCESS_CLIENT_ID'),
-        'CF-Access-Client-Secret': getEnv('CF_ACCESS_CLIENT_SECRET'),
-      },
-      body: JSON.stringify(data),
-    })
-    const json = await res.json()
-    if (!res.ok) {
-      return {
-        ok: false,
-        message: json?.message ?? 'Pendaftaran gagal',
-        errors: json?.errors,
-      }
-    }
+    const res = await alphaCFApi.post('/register', data)
+    
     return {
       ok: true,
-      message: json?.message,
-      data: json?.data,
-      verification_expires_at: json?.meta?.verification_expires_at,
+      message: res.data.message,
+      data: res.data.data,
+      verification_expires_at: res.data.meta?.verification_expires_at,
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      return {
+        ok: false,
+        message: error.response?.data?.message ?? 'Pendaftaran gagal',
+        errors: error.response?.data?.errors,
+      }
+    }
     return { ok: false, message: 'Terjadi kesalahan. Coba lagi.' }
   }
 }

@@ -1,6 +1,8 @@
 'use server'
 
-import { type ActionResult, getEnv } from '../_lib/env'
+import { AxiosError } from 'axios'
+import { alphaCFApi } from '../_lib/alpha-api'
+import type { ActionResult } from '../_lib/env'
 
 export type { ActionResult }
 
@@ -9,22 +11,13 @@ export async function subscribeNewsletter(data: {
   full_name?: string
 }): Promise<ActionResult> {
   try {
-    const res = await fetch(`${getEnv('ALPHA_API_URL')}/landing/newsletter`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'CF-Access-Client-Id': getEnv('CF_ACCESS_CLIENT_ID'),
-        'CF-Access-Client-Secret': getEnv('CF_ACCESS_CLIENT_SECRET'),
-      },
-      body: JSON.stringify(data),
-    })
-    const json = await res.json()
-    if (!res.ok) {
-      return { ok: false, message: json?.message ?? 'Gagal berlangganan' }
-    }
-    return { ok: true, message: json?.message }
-  } catch {
-    return { ok: false, message: 'Terjadi kesalahan. Coba lagi.' }
+    const res = await alphaCFApi.post('/landing/newsletter', data)
+    return { ok: true, message: res.data.message }
+  } catch (error) {
+    const message =
+      error instanceof AxiosError
+        ? (error.response?.data?.message ?? 'Gagal berlangganan')
+        : 'Terjadi kesalahan. Coba lagi.'
+    return { ok: false, message }
   }
 }

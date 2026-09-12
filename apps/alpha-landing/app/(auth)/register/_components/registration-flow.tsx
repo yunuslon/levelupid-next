@@ -25,7 +25,7 @@ export function RegistrationFlow() {
   const [submittedEmail, setSubmittedEmail] = useState('')
 
   return (
-    <div className="grid min-h-[calc(100dvh-4rem)] lg:grid-cols-2">
+    <div className="grid  lg:grid-cols-2">
       <div className="flex items-center justify-center px-4 py-12 lg:py-16">
         <div className="w-full max-w-md">
           {step === 'form' && (

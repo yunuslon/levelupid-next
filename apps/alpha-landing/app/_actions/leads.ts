@@ -1,6 +1,8 @@
 'use server'
 
-import { type ActionResult, getEnv } from '../_lib/env'
+import { AxiosError } from 'axios'
+import { alphaPublicApi } from '../_lib/alpha-api'
+import type { ActionResult } from '../_lib/env'
 
 export type { ActionResult }
 
@@ -13,20 +15,16 @@ export async function submitLead(data: {
   form_code?: string
 }): Promise<ActionResult> {
   try {
-    const res = await fetch(`${getEnv('ALPHA_API_URL')}/landing/leads`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ form_code: 'contact', ...data }),
+    const res = await alphaPublicApi.post('/landing/leads', {
+      form_code: 'contact',
+      ...data,
     })
-    const json = await res.json()
-    if (!res.ok) {
-      return { ok: false, message: json?.message ?? 'Gagal mengirim pesan' }
-    }
-    return { ok: true, message: json?.message }
-  } catch {
-    return { ok: false, message: 'Terjadi kesalahan. Coba lagi.' }
+    return { ok: true, message: res.data.message }
+  } catch (error) {
+    const message =
+      error instanceof AxiosError
+        ? (error.response?.data?.message ?? 'Gagal mengirim pesan')
+        : 'Terjadi kesalahan. Coba lagi.'
+    return { ok: false, message }
   }
 }
