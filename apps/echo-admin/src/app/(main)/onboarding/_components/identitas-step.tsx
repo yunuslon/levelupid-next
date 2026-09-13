@@ -108,10 +108,10 @@ export function IdentitasStep({ onComplete }: { onComplete: () => void }) {
                       <SelectValue placeholder="Pilih kategori" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="min-w-3xs p-2">
                     {BUSINESS_CATEGORIES.map((cat) => (
                       <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
+                        {cat.label}asas
                       </SelectItem>
                     ))}
                   </SelectContent>
