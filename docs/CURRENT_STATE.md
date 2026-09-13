@@ -1,18 +1,56 @@
 # Current State
 
-> Last updated: 2026-09-12 (API layer refactor: fetch → axios)
+> Last updated: 2026-09-13 (Phase 1 complete + admin apps tested)
 
 ---
 
 ## Phase Aktif
 
-**Alpha Landing Page — 100% ✅ COMPLETE**
+**Phase 1: Template Integration & Onboarding Wizard — COMPLETE ✅**
 
-Next: **Phase 1 (Template Integration & Shared UI)** untuk admin apps, atau lanjut Alpha Admin.
+Testing & bug fixes done. Both admin apps now functional. Next: Phase 2 (Shared Packages - API, Auth, Types).
 
 ---
 
 ## Recently Completed
+
+### Phase 1: Template Integration & Echo Admin Onboarding ✅
+
+**1.1 Template Fork (alpha-admin & echo-admin)**
+- ✅ Copied next-shadcn-admin-dashboard-baseui to both apps
+- ✅ Updated package.json dependencies (61 UI components, Base UI, TanStack Table, Zustand, etc.)
+- ✅ Updated next.config.ts, postcss.config.mjs, components.json
+- ✅ Fixed TypeScript errors (cn, react-hook-form, @shadcn/react, type assertions)
+- ✅ Both apps build and typecheck clean
+
+**1.2 Shared UI Components → @levelupid/ui**
+- ✅ Copied 61 components to packages/ui/src/components/
+- ✅ Added shared dependencies: class-variance-authority, cmdk, cn, @base-ui/react, etc.
+- ✅ Created @levelupid/ui/components/form.tsx (shadcn Form pattern)
+- ✅ Created use-mobile and use-lg hooks
+- ✅ packages/ui typechecks clean
+
+**1.3 Shared Configs Integration**
+- ✅ Both admin apps extend @levelupid/config-typescript
+- ✅ Tailwind v4 via postcss (no config file needed)
+- ✅ Root biome.json inherited by all apps
+
+**1.4 Echo Admin — Onboarding Wizard**
+- ✅ Created onboarding/_store/onboarding-store.ts (Zustand)
+- ✅ Created 5-step tab-based wizard layout
+- ✅ Steps: Identitas (store name, category, description, tagline), Kontak (email, phone, WA, address), Domain (subdomain with availability check), Tampilan (COMING SOON placeholder), Konfirmasi (summary)
+- ✅ Mock auth store with session state
+- ✅ Cookie-based onboarded flag set on completion
+
+**1.5 Post-Onboarding Dashboard**
+- ✅ Proxy middleware guard redirects non-onboarded users to /onboarding
+- ✅ Onboarding completion redirects to /dashboard/default
+- ✅ Template dashboard skeleton ready (default, crm, finance, etc.)
+
+**1.7 Fix 404 (post-review)**
+- ✅ Moved `src/proxy.ts` → `proxy.ts` (root) — Next 16 requires proxy at app root, not src/. Middleware now active (confirmed `ƒ Proxy (Middleware)` in build)
+- ✅ Added `src/app/page.tsx` root redirect — `/` was 404 (no root page). Now redirects to /onboarding or /dashboard/default based on `echo_onboarded` cookie
+- ✅ Verified no redirect loop; typecheck + build pass
 
 ### API Layer Refactor (Alpha Landing) ✅
 
@@ -54,6 +92,28 @@ Next: **Phase 1 (Template Integration & Shared UI)** untuk admin apps, atau lanj
 - ✅ **RULES.md updated** — tambah rule #5 (Industry-Aligned Development) & #6 (Reuse Before Recreate)
 - ✅ Verified: `pnpm lint`, `pnpm typecheck`, `pnpm build` — all pass
 
+### Admin Apps Testing & Bug Fixes ✅
+
+**2.1 Alpha-Admin & Echo-Admin 404 Diagnosis**
+- ✅ Identified: both apps had empty `app/` directories at root, causing Next.js 16 to ignore routes in `src/app/`
+- ✅ Root cause: template copied with empty `app/` folder. Next.js prefers root `app/` over `src/app/` by default
+- ✅ Fix: removed empty `apps/alpha-admin/app` and `apps/echo-admin/app` directories
+- ✅ Result: all routes now resolvable
+
+**2.2 Echo-Admin Onboarding 500 Error**
+- ✅ Issue: `/onboarding` route returned 500 — "useSidebar must be used within a SidebarProvider"
+- ✅ Root cause: `onboarding-wizard.tsx` imported `Sidebar` from `@levelupid/ui/components/sidebar` (shared package), but layout provided `SidebarProvider` from `@/components/ui/sidebar` (local app copy). Two separate React contexts → provider mismatch
+- ✅ Fix: aligned `onboarding-wizard.tsx` to import from `@/components/ui/sidebar` (same as all other components in both apps)
+- ✅ Result: onboarding now loads without errors
+
+**2.3 Playwright Route Testing**
+- ✅ Tested 23 routes on alpha-admin (port 3001): all 200s (redirects are 307, expected)
+  - `/`, `/dashboard`, `/dashboard/default`, `/dashboard/crm`, `/dashboard/finance`, `/dashboard/analytics`, `/dashboard/users`, `/dashboard/tasks`, `/dashboard/calendar`, `/dashboard/ecommerce`, `/dashboard/invoice`, `/dashboard/kanban`, `/dashboard/profile`, `/dashboard/file-manager`, `/dashboard/coming-soon`, `/chat`, `/mail`, `/auth/v1/login`, `/auth/v1/register`, `/auth/v2/login`, `/auth/v2/register`, `/unauthorized`
+- ✅ Tested 23 routes on echo-admin (port 3000): all 200s + `/onboarding` working
+- ✅ No 404s on tested routes. Client-side onboarding routing (steps accessed via Zustand state, not URL paths)
+
+
+
 ### Version Upgrade ✅
 
 - ✅ Next.js 15.0.3 → **16.3.4**
@@ -74,28 +134,28 @@ Next: **Phase 1 (Template Integration & Shared UI)** untuk admin apps, atau lanj
 
 ## In Progress
 
-_(none — Alpha Landing selesai; siap ke Phase 1 admin atau feature lanjutan)_
+_(none — Phase 1 complete; ready for Phase 2 or Phase 3 work)_
 
 ---
 
-## Next Steps (Pilih Salah Satu)
+## Next Steps
 
-**Option A: Complete Alpha Landing polish**
-1. Integrate `GET /landing/content` — swap mock data ke real API di section stats/testimonials/faqs/cta
-2. Fetch data di server component dengan ISR revalidate
-3. Add error boundary + loading states
-4. Add sitemap.xml + robots.txt
+**Option A: Phase 2 — Shared Packages (API, Auth, Types)**
+1. Build `@levelupid/api-client` with Axios factory + interceptors
+2. Build `@levelupid/query-client` with React Query config + queryKeys factory
+3. Build `@levelupid/auth` with Auth.js v5 shared config + session types
+4. Build `@levelupid/types` with Zod schemas (Customer, Product, Order, Tenant)
+5. Setup MSW mocks in `@levelupid/api-mocks` for endpoints not ready
 
-**Option B: Phase 1 — Alpha Admin Template Fork**
-1. Fork `next-shadcn-admin-dashboard-baseui` ke `apps/alpha-admin/`
-2. Fork ke `apps/echo-admin/`
-3. Extract shared UI components ke `packages/ui/src/components/`
-4. Update imports ke `@levelupid/ui`
+**Option B: Phase 3 — Continue Echo Admin**
+1. Product management (CRUD)
+2. Order management (view, status updates)
+3. Integrate real API when BE ready
 
-**Option C: Phase 3 — Registration Verification Flow (partial done)**
-1. ~~Resend verification link handler + UI~~ ✅ done (check-email step)
-2. `/register/verify?token=xxx` page — call POST `/register/verify` (belum dibuat — user klik link di email akan hit backend langsung atau butuh page ini)
-3. Redirect ke `verified` step setelah verifikasi sukses
+**Option C: Phase 4 — Echo Storefront**
+1. Multi-tenant middleware
+2. Product listing & detail pages
+3. Basic storefront layout
 
 ---
 
@@ -107,42 +167,22 @@ _(none)_
 
 ## Known Issues
 
-### ✅ RESOLVED — Border color utility class tidak berubah warna
-
-**Fix applied (2026-09-11):** Wrap universal border rule dalam `@layer base` di `apps/alpha-landing/app/globals.css`:
-
-```css
-@layer base {
-  * {
-    border-color: var(--border);
-  }
-  body { ... }
-}
-```
-
-Sekarang `border-red-600` dll bekerja normal karena Tailwind v4 layer order (`base` < `utilities`) membuat utility class menang. Verified: build pass.
-
-**Root cause (arsip):** Universal selector `* { border-color: var(--border) }` sebelumnya di-declare di luar `@layer`, sehingga specificity-nya bersaing langsung dengan utility class dan menang karena cascade order (declared later in file). Fix: bungkus dalam `@layer base` supaya Tailwind v4 layer ordering (`base` < `utilities`) membuat utility class menang otomatis.
+_(none new — all Phase 1 issues resolved)_
 
 ---
 
-## Decisions Made (Recent)
+## Decisions Made (This Phase)
 
-- **Package manager:** pnpm (bukan Bun) — alasan: stability Next.js runtime, Vercel deployment lancar
-- **Monorepo:** Single Turborepo (bukan multi-repo) — alasan: shared design system, atomic changes
-- **Framework:** Next.js 16 untuk semua 4 app (termasuk landing) — alasan: ISR + SEO consistent
-- **Auth strategy:** Hybrid sessions terpisah per boundary (Alpha internal, Echo admin, Echo consumer)
-- **Multi-tenant:** Custom domain per tenant, resolve via middleware hostname
-- **Landing font:** Poppins (via `next/font/google`)
-- **Landing charts:** Recharts direct (skip ChartContainer wrapper, keep simple)
-- **Content strategy:** Mock data dulu di `_content/*.ts`, swap ke API `/landing/content` di iterasi berikutnya
-- **CF-Access secret handling:** Server Actions only (`app/_actions/*.ts`), never expose to browser. **Centralized di `app/_lib/alpha-api.ts`** (2026-09-12 refactor)
-- **ISR:** homepage `revalidate = 3600` (1 jam)
-- **Legal pages:** Copy dari reference project (placeholder, edit final di kemudian hari)
+- **Template source:** next-shadcn-admin-dashboard-baseui (61 components, Base UI, TanStack Table)
+- **UI package strategy:** Centralized shared components in @levelupid/ui, apps import from there
+- **Onboarding flow:** Tab-based (single page, all steps on one route, client-side navigation via Zustand)
+- **Onboarding guard:** Proxy middleware + cookie flag (mock, will be replaced by Auth.js session later)
+- **Form pattern:** shadcn Form (react-hook-form + Zod) — custom impl using Base UI + useRender
+- **Mock auth:** Zustand store, separate from real Auth.js (will integrate Phase 3)
 
 ---
 
-## Tech Stack (Current Versions)
+## Tech Stack (Updated)
 
 | Package | Version |
 |---------|---------|

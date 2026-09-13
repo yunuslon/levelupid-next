@@ -33,7 +33,7 @@ export async function registerTenant(data: {
 }): Promise<RegisterResult> {
   try {
     const res = await alphaCFApi.post('/register', data)
-    
+
     return {
       ok: true,
       message: res.data.message,

@@ -74,6 +74,28 @@ Sebelum membuat function/component/hook baru, **WAJIB cek dulu** apakah sudah ad
 
 ---
 
+## 7. Follow Clean Code & SOLID Principles
+
+Semua code harus mengikuti prinsip clean code dan SOLID. Pastikan kode mudah dibaca, di-maintain, dan di-extend oleh developer lain.
+
+**Clean Code:**
+- **Meaningful names** — variable, function, class harus self-explanatory. Hindari singkatan ambigu (`usr` → `user`, `calc` → `calculateTotal`)
+- **Single responsibility** — satu function/class = satu tujuan. Jika function melakukan 2+ hal berbeda, split
+- **Small functions** — prefer short, focused functions. Jika function terlalu panjang, pertimbangkan refactor
+- **No magic numbers** — pakai named constants, bukan hardcoded value
+- **Clear error handling** — jangan silent catch. Log/throw dengan message jelas
+
+**SOLID:**
+- **S — Single Responsibility:** setiap module/class punya satu alasan untuk berubah
+- **O — Open/Closed:** terbuka untuk extension (via composition/inheritance), tertutup untuk modification (jangan edit core logic yang sudah stabil)
+- **L — Liskov Substitution:** subtype harus bisa replace parent tanpa break behavior
+- **I — Interface Segregation:** jangan paksa implementor depend pada method yang tidak dipakai (prefer small, specific interfaces)
+- **D — Dependency Inversion:** depend on abstractions (interfaces/types), bukan concrete implementations
+
+Balance dengan pragmatisme — jangan over-engineer.
+
+---
+
 ## Notes
 
 - Aturan bisa bertambah seiring kebutuhan project.

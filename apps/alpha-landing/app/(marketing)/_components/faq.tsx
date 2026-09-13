@@ -1,6 +1,10 @@
 'use client'
 
-import { Collapsible } from '@levelupid/ui/components/collapsible'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@levelupid/ui/components/collapsible'
 import { HelpCircle } from 'lucide-react'
 import { useReveal } from '../../_hooks/use-reveal'
 import { faqSupport } from '../_content/cta'
@@ -37,13 +41,15 @@ export function Faq() {
             <Collapsible
               key={faq.question}
               className="rounded-2xl border bg-white px-5"
-              trigger={
-                <span className="text-[15px] font-medium">{faq.question}</span>
-              }
             >
-              <p className="text-sm leading-relaxed text-slate-600">
-                {faq.answer}
-              </p>
+              <CollapsibleTrigger className="flex w-full items-center justify-between py-4 text-left">
+                <span className="text-[15px] font-medium">{faq.question}</span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pb-4">
+                <p className="text-sm leading-relaxed text-slate-600">
+                  {faq.answer}
+                </p>
+              </CollapsibleContent>
             </Collapsible>
           ))}
         </div>

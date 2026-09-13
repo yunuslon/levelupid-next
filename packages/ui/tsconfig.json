@@ -3,7 +3,12 @@
   "compilerOptions": {
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
-    "jsxImportSource": "react"
+    "jsxImportSource": "react",
+    "paths": {
+      "@/components/ui/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/lib/*": ["./src/lib/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

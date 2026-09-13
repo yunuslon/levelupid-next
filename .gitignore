@@ -39,3 +39,6 @@ yarn-error.log*
 
 # deployment
 .vercel
+
+# Testing
+.playwright-cli
