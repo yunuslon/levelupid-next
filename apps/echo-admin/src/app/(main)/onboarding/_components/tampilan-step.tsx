@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@levelupid/ui/components/button'
+import { Palette } from 'lucide-react'
 import { useOnboardingStore } from '../_store/onboarding-store'
 
 export function TampilanStep({ onComplete }: { onComplete: () => void }) {
@@ -12,31 +13,21 @@ export function TampilanStep({ onComplete }: { onComplete: () => void }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Tampilan Toko</h2>
-        <p className="text-sm text-muted-foreground">
+    <div className="space-y-8 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
+      <div className="space-y-2 border-b pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+          Langkah 4 dari 5
+        </p>
+        <h2 className="text-2xl font-bold tracking-tight">Tampilan Toko</h2>
+        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
           Pilih tema dan template untuk toko Anda
         </p>
       </div>
 
-      <div className="rounded-lg border-2 border-dashed border-muted-foreground/50 p-12 text-center">
+      <div className="rounded-xl border border-dashed border-primary/30 bg-primary/[0.03] p-8 text-center sm:p-12">
         <div className="space-y-4">
-          <div className="mx-auto h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Palette className="h-8 w-8" strokeWidth={1.7} />
           </div>
           <div>
             <h3 className="text-lg font-semibold">Fitur Ini Segera Hadir</h3>
@@ -48,8 +39,8 @@ export function TampilanStep({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
 
-      <div className="rounded-lg bg-muted p-4">
-        <p className="text-sm font-medium">Apa yang akan datang:</p>
+      <div className="rounded-xl bg-muted/60 p-5">
+        <p className="text-sm font-semibold">Apa yang akan datang</p>
         <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
           <li>✓ Pilih template per kategori usaha</li>
           <li>✓ Ubah warna dan font</li>

@@ -13,6 +13,9 @@ export type OnboardingFormData = {
   phone: string
   whatsapp: string
   address: string
+  city: string
+  province: string
+  postalCode: string
 
   // Domain
   subdomain: string
@@ -24,7 +27,10 @@ export type OnboardingFormData = {
 
 type OnboardingStore = {
   formData: OnboardingFormData
-  updateField: (field: keyof OnboardingFormData, value: any) => void
+  updateField: <K extends keyof OnboardingFormData>(
+    field: K,
+    value: OnboardingFormData[K],
+  ) => void
   setCurrentStep: (step: number) => void
   markStepComplete: (step: number) => void
   reset: () => void
@@ -40,6 +46,9 @@ const initialData: OnboardingFormData = {
   phone: '',
   whatsapp: '',
   address: '',
+  city: '',
+  province: '',
+  postalCode: '',
   subdomain: '',
   currentStep: 0,
   completedSteps: [],

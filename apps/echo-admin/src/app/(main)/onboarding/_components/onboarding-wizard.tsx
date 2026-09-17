@@ -1,8 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
-import { Button } from '@levelupid/ui/components/button'
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { Button } from '@levelupid/ui/components/button'
 
 import { useOnboardingStore } from '../_store/onboarding-store'
 
@@ -33,16 +31,22 @@ export function OnboardingSidebar() {
   }
 
   return (
-    <Sidebar collapsible="none">
-      <SidebarHeader className="h-16 border-b px-6">
-        <div className="flex items-center gap-2 font-semibold">
-          <span className="text-lg">Echo Admin</span>
+    <Sidebar collapsible="none" className="hidden border-r bg-sidebar md:flex">
+      <SidebarHeader className="border-b px-5 py-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sidebar-primary text-sm font-bold text-sidebar-primary-foreground">
+            E
+          </div>
+          <div>
+            <p className="font-semibold tracking-tight">Echo Admin</p>
+            <p className="text-xs text-sidebar-foreground/60">Store setup</p>
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <div className="px-4 py-4">
-          <h3 className="mb-2 px-2 text-xs font-medium uppercase text-muted-foreground">
-            Setup Toko
+        <div className="px-3 py-6">
+          <h3 className="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/50">
+            Langkah setup
           </h3>
           <SidebarMenu>
             {STEPS.map((step) => {
@@ -62,7 +66,7 @@ export function OnboardingSidebar() {
                       <div
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold ${
                           isCompleted
-                            ? 'border-green-500 bg-green-500/10 text-green-600'
+                            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600'
                             : isActive
                               ? 'border-primary bg-primary/10 text-primary'
                               : 'border-border bg-background text-muted-foreground'
@@ -79,10 +83,21 @@ export function OnboardingSidebar() {
           </SidebarMenu>
         </div>
       </SidebarContent>
-      <SidebarFooter className="border-t px-4 py-4">
-        <p className="text-xs text-muted-foreground">
-          {formData.completedSteps.length} / {STEPS.length} selesai
-        </p>
+      <SidebarFooter className="border-t px-5 py-5">
+        <div className="mb-2 flex items-center justify-between text-xs">
+          <span className="text-sidebar-foreground/60">Progress</span>
+          <span className="font-medium">
+            {formData.completedSteps.length}/{STEPS.length}
+          </span>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-sidebar-accent">
+          <div
+            className="h-full rounded-full bg-sidebar-primary transition-all"
+            style={{
+              width: `${(formData.completedSteps.length / STEPS.length) * 100}%`,
+            }}
+          />
+        </div>
       </SidebarFooter>
     </Sidebar>
   )

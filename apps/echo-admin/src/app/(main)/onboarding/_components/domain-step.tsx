@@ -65,10 +65,13 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Domain Toko</h2>
-        <p className="text-sm text-muted-foreground">
+    <div className="space-y-8 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
+      <div className="space-y-2 border-b pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+          Langkah 3 dari 5
+        </p>
+        <h2 className="text-2xl font-bold tracking-tight">Domain Toko</h2>
+        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
           Pilih subdomain untuk toko Anda
         </p>
       </div>
@@ -78,7 +81,7 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
           <FormField
             control={form.control}
             name="subdomain"
-            render={({ field }: { field: any }) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Subdomain *</FormLabel>
                 <FormControl>
@@ -92,7 +95,7 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
                         }}
                       />
                     </div>
-                    <span className="flex items-center text-sm text-muted-foreground">
+                    <span className="flex items-center whitespace-nowrap text-sm text-muted-foreground">
                       .levelupid.com
                     </span>
                   </div>
@@ -103,11 +106,11 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
           />
 
           {subdomain && subdomain.length >= 3 && (
-            <div className="rounded-lg border p-4">
-              <p className="text-sm">
+            <div className="rounded-xl border bg-muted/30 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 <strong>URL Toko Anda:</strong>
               </p>
-              <p className="font-mono text-lg">
+              <p className="mt-2 break-all font-mono text-base font-medium sm:text-lg">
                 https://{subdomain}.levelupid.com
               </p>
               {checking && (

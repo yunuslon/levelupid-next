@@ -1,7 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 import { DomainStep } from './_components/domain-step'
 import { IdentitasStep } from './_components/identitas-step'
 import { KonfirmasiStep } from './_components/konfirmasi-step'
@@ -10,7 +8,6 @@ import { TampilanStep } from './_components/tampilan-step'
 import { useOnboardingStore } from './_store/onboarding-store'
 
 export default function OnboardingPage() {
-  const router = useRouter()
   const { formData, setCurrentStep } = useOnboardingStore()
 
   const goToNextStep = () => {

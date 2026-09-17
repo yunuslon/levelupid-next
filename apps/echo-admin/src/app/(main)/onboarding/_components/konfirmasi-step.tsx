@@ -45,18 +45,24 @@ export function KonfirmasiStep() {
   ]
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Konfirmasi</h2>
-        <p className="text-sm text-muted-foreground">
+    <div className="space-y-8 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
+      <div className="space-y-2 border-b pb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+          Langkah 5 dari 5
+        </p>
+        <h2 className="text-2xl font-bold tracking-tight">Konfirmasi</h2>
+        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
           Periksa kembali informasi toko Anda sebelum menyimpan
         </p>
       </div>
 
-      <div className="rounded-lg border">
+      <div className="overflow-hidden rounded-xl border">
         <div className="divide-y">
           {items.map((item) => (
-            <div key={item.label} className="flex justify-between px-4 py-3">
+            <div
+              key={item.label}
+              className="flex flex-col gap-1 px-4 py-3.5 sm:flex-row sm:justify-between sm:gap-4"
+            >
               <span className="text-sm text-muted-foreground">
                 {item.label}
               </span>
@@ -68,7 +74,7 @@ export function KonfirmasiStep() {
         </div>
       </div>
 
-      <div className="rounded-lg bg-muted p-4">
+      <div className="rounded-xl bg-muted/60 p-5">
         <p className="text-sm text-muted-foreground">
           Dengan menekan tombol di bawah, Anda menyetujui untuk membuat toko
           dengan informasi di atas. Anda dapat mengubah informasi ini nanti di
