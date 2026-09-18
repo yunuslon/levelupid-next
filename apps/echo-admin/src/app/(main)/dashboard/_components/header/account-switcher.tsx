@@ -1,36 +1,37 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { cn } from 'cn'
-import { BadgeCheck, Bell, Check, CreditCard, LogOut } from 'lucide-react'
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { echoPost } from '@/lib/echo-client'
 import { getInitials } from '@/lib/utils'
 
-export function AccountSwitcher({
-  users,
-}: {
-  readonly users: ReadonlyArray<{
-    readonly id: string
-    readonly name: string
-    readonly email: string
-    readonly avatar: string
-    readonly role: string
-  }>
-}) {
-  const [activeUser, setActiveUser] = useState(users[0])
+type AccountUser = {
+  full_name: string
+  email: string
+  is_owner: boolean
+}
 
-  if (!activeUser) {
-    return null
+export function AccountSwitcher({ user }: { user: AccountUser }) {
+  const router = useRouter()
+  const [loggingOut, setLoggingOut] = useState(false)
+
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      await echoPost('auth/logout')
+    } finally {
+      router.replace('/auth/login')
+      router.refresh()
+    }
   }
 
   return (
@@ -38,12 +39,9 @@ export function AccountSwitcher({
       <DropdownMenuTrigger
         nativeButton={false}
         render={<Avatar className="size-9 rounded-lg" />}
+        aria-label={`Open account menu for ${user.full_name}`}
       >
-        <AvatarImage
-          src={activeUser.avatar || undefined}
-          alt={activeUser.name}
-        />
-        <AvatarFallback>{getInitials(activeUser.name)}</AvatarFallback>
+        <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="min-w-56 space-y-1 rounded-lg"
@@ -51,52 +49,16 @@ export function AccountSwitcher({
         align="end"
         sideOffset={4}
       >
-        {users.map((user) => (
-          <DropdownMenuItem
-            key={user.email}
-            className={cn('p-0', user.id === activeUser.id && 'bg-accent/50')}
-            aria-current={user.id === activeUser.id ? 'true' : undefined}
-            onClick={() => setActiveUser(user)}
-          >
-            <div className="flex w-full items-center gap-2 px-1 py-1.5">
-              <Avatar className="size-9 rounded-lg">
-                <AvatarImage src={user.avatar || undefined} alt={user.name} />
-                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-              </Avatar>
-              <div className="grid min-w-0 flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs capitalize">{user.role}</span>
-              </div>
-              <span
-                className={cn(
-                  'mr-1 flex size-5 items-center justify-center rounded-full text-primary opacity-0',
-                  user.id === activeUser.id && 'opacity-100',
-                )}
-              >
-                <Check aria-hidden="true" />
-              </span>
-            </div>
-          </DropdownMenuItem>
-        ))}
+        <div className="px-2 py-1.5">
+          <p className="truncate text-sm font-semibold">{user.full_name}</p>
+          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+          <p className="mt-1 text-xs capitalize text-muted-foreground">
+            {user.is_owner ? 'Owner' : 'Staff'}
+          </p>
+        </div>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <BadgeCheck />
-            Account
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard />
-            Billing
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell />
-            Notifications
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut />
-          Log out
+        <DropdownMenuItem onClick={handleLogout} disabled={loggingOut}>
+          {loggingOut ? 'Logging out...' : 'Log out'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

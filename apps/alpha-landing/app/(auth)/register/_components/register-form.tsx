@@ -98,6 +98,7 @@ export function RegisterForm({
           <input
             {...form.register('fullName')}
             id="rg-name"
+            autoComplete="name"
             placeholder="Nama Anda"
             className={inputClass}
             aria-invalid={!!form.formState.errors.fullName}
@@ -117,6 +118,7 @@ export function RegisterForm({
             {...form.register('email')}
             id="rg-email"
             type="email"
+            autoComplete="email"
             placeholder="nama@email.com"
             className={inputClass}
             aria-invalid={!!form.formState.errors.email}
@@ -137,6 +139,7 @@ export function RegisterForm({
             id="rg-phone"
             type="tel"
             inputMode="tel"
+            autoComplete="tel"
             placeholder="08xx xxxx xxxx"
             className={inputClass}
             aria-invalid={!!form.formState.errors.phone}
@@ -156,6 +159,7 @@ export function RegisterForm({
             {...form.register('password')}
             id="rg-pass"
             type="password"
+            autoComplete="new-password"
             placeholder="Minimal 8 karakter"
             className={inputClass}
             aria-invalid={!!form.formState.errors.password}
@@ -178,11 +182,11 @@ export function RegisterForm({
                   checked={Boolean(field.value)}
                   onCheckedChange={(v) => field.onChange(v)}
                   aria-invalid={fieldState.invalid}
-                  className="mt-0.5"
+                  className="mt-0.5 size-4 shrink-0 rounded-[4px] border-[var(--input)] text-white data-checked:border-[var(--primary)] data-checked:bg-[var(--primary)] focus-visible:border-[var(--ring)] focus-visible:ring-[var(--ring)]/50 [&_[data-slot=checkbox-indicator]>svg]:!size-3"
                 />
                 <label
                   htmlFor="rg-terms"
-                  className="cursor-pointer text-sm font-normal leading-snug"
+                  className="min-w-0 cursor-pointer text-sm font-normal leading-snug"
                 >
                   Saya menyetujui perjanjian penggunaan layanan.
                 </label>

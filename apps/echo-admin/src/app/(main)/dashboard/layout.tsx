@@ -12,7 +12,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { users } from '@/data/users'
 import { getAccountState } from '@/lib/server/echo-api'
 import { getPreference } from '@/server/server-actions'
 import { AccountStateGate } from './_components/account-state-gate'
@@ -81,7 +80,7 @@ export default async function Layout({
               <LayoutControls />
               <ThemeSwitcher />
               <GitHubRepositoriesMenu />
-              <AccountSwitcher users={users} />
+              <AccountSwitcher user={account.user} />
             </div>
           </div>
         </header>

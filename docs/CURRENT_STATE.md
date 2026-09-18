@@ -1,6 +1,6 @@
 # Current State
 
-> Last updated: 2026-09-18 (Echo Admin API integration implemented)
+> Last updated: 2026-09-18 (Echo Admin cleanup + Alpha Landing API hardening)
 
 ---
 
@@ -143,6 +143,11 @@ Echo Admin sekarang terhubung ke staging API untuk auth, account state, dan onbo
 - ✅ Dashboard blocking state untuk `provisioning`, `provisioning_failed`, dan `suspended`.
 - ✅ Provisioning polling setiap 8 detik dan tombol refresh manual.
 - ✅ Sidebar Echo Admin dan halaman placeholder produk/pesanan.
+- ✅ Route template yang tidak dipakai dihapus; dashboard default aktif dipertahankan sebagai baseline untuk pengembangan bertahap.
+- ✅ Header account menu memakai user dari `GET /me` dan logout melalui backend.
+- ✅ Alpha Landing resend, registration error mapping, dan failed API envelope handling diseragamkan.
+- ✅ Dependency/provider Alpha Landing yang tidak memiliki consumer aktif dihapus.
+- ✅ Unit test Alpha Landing ditambahkan untuk API helper, resend, dan registration error handling.
 - ⚠️ Credential CF-Access staging harus tersedia di `.env.local` dan secret yang sempat dibagikan harus di-rotate.
 - ⚠️ 403 dari staging dapat disebabkan oleh VPN/IP block atau Cloudflare WAF challenge; uji ulang tanpa VPN sebelum mengubah proxy.
 - ⚠️ Endpoint produk dan pesanan belum diintegrasikan; halaman masih placeholder.
@@ -202,6 +207,7 @@ _(none new — all Phase 1 issues resolved)_
 - **Wizard validation:** hanya `store_name` dan `subdomain` yang diblokir oleh validasi frontend; field lain mengikuti kontrak backend dan boleh kosong.
 - **Browser API client:** Echo client menggunakan shared Axios factory; `401` mencoba refresh satu kali lalu mengarahkan ke `/auth/login` jika refresh gagal.
 - **Network troubleshooting:** request browser ke `/api/echo` memang terlihat sebagai localhost karena melewati Next.js BFF; upstream staging hanya dipanggil server-side. Jangan mengekspos CF Access secret ke browser.
+- **Template cleanup:** Echo mempertahankan dashboard default yang sudah tampil, onboarding, auth, profile, serta route Produk/Pesanan placeholder; route demo template lain dihapus dan dapat ditambahkan kembali dari template bila diperlukan.
 
 ---
 

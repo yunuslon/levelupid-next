@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Bricolage_Grotesque, Onest } from 'next/font/google'
 import './globals.css'
-import { Providers } from './providers'
 
 const onest = Onest({
   subsets: ['latin'],
@@ -85,9 +84,7 @@ export default function RootLayout({
       className={`${onest.variable} ${bricolage.variable}`}
       suppressHydrationWarning
     >
-      <body className="antialiased font-sans">
-        <Providers>{children}</Providers>
-      </body>
+      <body className="antialiased font-sans">{children}</body>
     </html>
   )
 }

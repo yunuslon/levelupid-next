@@ -2,6 +2,7 @@
 
 import { AxiosError } from 'axios'
 import { alphaCFApi } from '../_lib/alpha-api'
+import { getApiFailureMessage, normalizeFieldErrors } from '../_lib/env'
 
 export type RegisterResult = {
   ok: boolean
@@ -33,6 +34,16 @@ export async function registerTenant(data: {
 }): Promise<RegisterResult> {
   try {
     const res = await alphaCFApi.post('/register', data)
+    const failure = getApiFailureMessage(res.data, 'Pendaftaran gagal')
+    if (failure) {
+      return {
+        ok: false,
+        message: failure,
+        errors: normalizeFieldErrors(
+          res.data?.errors ?? res.data?.error?.details,
+        ),
+      }
+    }
 
     return {
       ok: true,
@@ -45,7 +56,9 @@ export async function registerTenant(data: {
       return {
         ok: false,
         message: error.response?.data?.message ?? 'Pendaftaran gagal',
-        errors: error.response?.data?.errors,
+        errors: normalizeFieldErrors(
+          error.response?.data?.errors ?? error.response?.data?.error?.details,
+        ),
       }
     }
     return { ok: false, message: 'Terjadi kesalahan. Coba lagi.' }

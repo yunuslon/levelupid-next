@@ -2,7 +2,7 @@
 
 import { AxiosError } from 'axios'
 import { alphaCFApi } from '../_lib/alpha-api'
-import type { ActionResult } from '../_lib/env'
+import { type ActionResult, getApiFailureMessage } from '../_lib/env'
 
 export type { ActionResult }
 
@@ -12,6 +12,8 @@ export async function subscribeNewsletter(data: {
 }): Promise<ActionResult> {
   try {
     const res = await alphaCFApi.post('/landing/newsletter', data)
+    const failure = getApiFailureMessage(res.data, 'Gagal berlangganan')
+    if (failure) return { ok: false, message: failure }
     return { ok: true, message: res.data.message }
   } catch (error) {
     const message =

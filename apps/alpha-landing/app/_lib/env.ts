@@ -16,3 +16,29 @@ export type ActionResult = {
   message?: string
   errors?: Record<string, string>
 }
+
+export function normalizeFieldErrors(
+  value: unknown,
+): Record<string, string> | undefined {
+  if (!value || typeof value !== 'object') return undefined
+
+  const errors: Record<string, string> = {}
+  for (const [key, messages] of Object.entries(value)) {
+    if (Array.isArray(messages)) {
+      errors[key] = messages.filter(Boolean).join(' ')
+    } else if (typeof messages === 'string') {
+      errors[key] = messages
+    }
+  }
+
+  return Object.keys(errors).length > 0 ? errors : undefined
+}
+
+export function getApiFailureMessage(
+  value: unknown,
+  fallback: string,
+): string | undefined {
+  if (!value || typeof value !== 'object') return fallback
+  const body = value as { success?: boolean; message?: string }
+  return body.success === false ? body.message || fallback : undefined
+}
