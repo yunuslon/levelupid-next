@@ -7,7 +7,8 @@ const STEPS = [
   { id: 1, title: 'Kontak' },
   { id: 2, title: 'Domain' },
   { id: 3, title: 'Tampilan' },
-  { id: 4, title: 'Konfirmasi' },
+  { id: 4, title: 'Preferensi' },
+  { id: 5, title: 'Konfirmasi' },
 ]
 
 export default function StepCircle() {

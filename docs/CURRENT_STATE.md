@@ -1,14 +1,14 @@
 # Current State
 
-> Last updated: 2026-09-13 (Phase 1 complete + admin apps tested)
+> Last updated: 2026-09-18 (Echo Admin API integration implemented)
 
 ---
 
 ## Phase Aktif
 
-**Phase 1: Template Integration & Onboarding Wizard — COMPLETE ✅**
+**Phase 4: Echo Admin API Integration — IN PROGRESS 🚧**
 
-Testing & bug fixes done. Both admin apps now functional. Next: Phase 2 (Shared Packages - API, Auth, Types).
+Echo Admin sekarang terhubung ke staging API untuk auth, account state, dan onboarding wizard. Dashboard dan menu domain sudah disiapkan dengan placeholder karena endpoint produk/pesanan masih development.
 
 ---
 
@@ -134,7 +134,18 @@ Testing & bug fixes done. Both admin apps now functional. Next: Phase 2 (Shared 
 
 ## In Progress
 
-_(none — Phase 1 complete; ready for Phase 2 or Phase 3 work)_
+### Echo Admin API Integration 🚧
+
+- ✅ Server-side Echo API proxy menggunakan `ECHO_API_URL` dan CF-Access headers.
+- ✅ Bearer token disimpan dalam HttpOnly cookie dan tidak diekspos ke browser.
+- ✅ Login `/auth/login`, logout, token refresh, dan redirect berbasis `GET /me`.
+- ✅ Wizard state/options, submit step 1-5, subdomain check, dan finish terintegrasi.
+- ✅ Dashboard blocking state untuk `provisioning`, `provisioning_failed`, dan `suspended`.
+- ✅ Provisioning polling setiap 8 detik dan tombol refresh manual.
+- ✅ Sidebar Echo Admin dan halaman placeholder produk/pesanan.
+- ⚠️ Credential CF-Access staging harus tersedia di `.env.local` dan secret yang sempat dibagikan harus di-rotate.
+- ⚠️ 403 dari staging dapat disebabkan oleh VPN/IP block atau Cloudflare WAF challenge; uji ulang tanpa VPN sebelum mengubah proxy.
+- ⚠️ Endpoint produk dan pesanan belum diintegrasikan; halaman masih placeholder.
 
 ---
 
@@ -179,6 +190,18 @@ _(none new — all Phase 1 issues resolved)_
 - **Onboarding guard:** Proxy middleware + cookie flag (mock, will be replaced by Auth.js session later)
 - **Form pattern:** shadcn Form (react-hook-form + Zod) — custom impl using Base UI + useRender
 - **Mock auth:** Zustand store, separate from real Auth.js (will integrate Phase 3)
+
+### Echo Admin Integration Decisions
+
+- **API base:** staging `ECHO_API_URL` dengan path `/api/v1`.
+- **Server boundary:** CF-Access credentials hanya digunakan pada Next.js server-side proxy.
+- **Session transport:** backend opaque token tetap dikirim sebagai `Authorization: Bearer`; browser hanya menerima HttpOnly cookie.
+- **Account routing:** `GET /me.next_screen` menjadi sumber keputusan layar; route login frontend adalah `/auth/login` tanpa versi URL.
+- **Provisioning:** dashboard diblokir dan polling account state setiap 8 detik sampai status menjadi `dashboard`.
+- **Echo session boundary:** custom Next.js proxy + HttpOnly cookie dipakai sebagai pengganti Auth.js untuk Echo Admin karena backend memakai opaque token, refresh rotation, dan CF-Access secret harus tetap server-side.
+- **Wizard validation:** hanya `store_name` dan `subdomain` yang diblokir oleh validasi frontend; field lain mengikuti kontrak backend dan boleh kosong.
+- **Browser API client:** Echo client menggunakan shared Axios factory; `401` mencoba refresh satu kali lalu mengarahkan ke `/auth/login` jika refresh gagal.
+- **Network troubleshooting:** request browser ke `/api/echo` memang terlihat sebagai localhost karena melewati Next.js BFF; upstream staging hanya dipanggil server-side. Jangan mengekspos CF Access secret ke browser.
 
 ---
 

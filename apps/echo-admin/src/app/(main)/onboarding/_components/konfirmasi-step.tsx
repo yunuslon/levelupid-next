@@ -3,37 +3,43 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { echoPost } from '@/lib/echo-client'
+import type { EchoWizardOptions } from '@levelupid/types'
 import { Button } from '@levelupid/ui/components/button'
 import { useOnboardingStore } from '../_store/onboarding-store'
 
-const CATEGORY_LABELS: Record<string, string> = {
-  fashion: 'Fashion & Apparel',
-  food: 'Food & Beverage',
-  electronics: 'Electronics',
-  home: 'Home & Garden',
-  beauty: 'Beauty & Personal Care',
-  automotive: 'Automotive',
-  other: 'Lainnya',
-}
-
-export function KonfirmasiStep() {
+export function KonfirmasiStep({ options }: { options: EchoWizardOptions }) {
   const router = useRouter()
   const { formData, markStepComplete } = useOnboardingStore()
   const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleSubmit = async () => {
     setSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    markStepComplete(4)
-    document.cookie = 'echo_onboarded=true; path=/; max-age=31536000'
-    router.push('/dashboard/default')
+    setErrorMessage('')
+    try {
+      const result = await echoPost<{ domain: string }>('wizard/finish')
+      markStepComplete(5)
+      router.push(
+        `/dashboard/default?provisioning_domain=${encodeURIComponent(result.domain)}`,
+      )
+      router.refresh()
+    } catch (error) {
+      setSubmitting(false)
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Toko belum dapat dibuat.',
+      )
+    }
   }
 
   const items = [
     { label: 'Nama Toko', value: formData.storeName },
     {
       label: 'Kategori',
-      value: CATEGORY_LABELS[formData.businessCategory] || '-',
+      value:
+        options.categories.find(
+          (category) => String(category.id) === formData.businessCategory,
+        )?.name || '-',
     },
     { label: 'Deskripsi', value: formData.description || '-' },
     { label: 'Tagline', value: formData.tagline || '-' },
@@ -41,7 +47,7 @@ export function KonfirmasiStep() {
     { label: 'Telepon', value: formData.phone },
     { label: 'WhatsApp', value: formData.whatsapp || '-' },
     { label: 'Alamat', value: formData.address },
-    { label: 'URL Toko', value: `https://${formData.subdomain}.levelupid.com` },
+    { label: 'Subdomain', value: formData.subdomain },
   ]
 
   return (
@@ -82,6 +88,9 @@ export function KonfirmasiStep() {
         </p>
       </div>
 
+      {errorMessage && (
+        <p className="text-sm text-destructive">{errorMessage}</p>
+      )}
       <Button onClick={handleSubmit} className="w-full" disabled={submitting}>
         {submitting ? 'Menyimpan...' : 'Buat Toko Saya'}
       </Button>

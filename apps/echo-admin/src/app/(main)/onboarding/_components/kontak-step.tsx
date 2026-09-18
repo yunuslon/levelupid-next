@@ -16,6 +16,7 @@ import {
 import { Input } from '@levelupid/ui/components/input'
 import { Textarea } from '@levelupid/ui/components/textarea'
 
+import { echoPut } from '@/lib/echo-client'
 import {
   Select,
   SelectContent,
@@ -23,24 +24,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@levelupid/ui/components/select'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CITIES_BY_PROVINCE, PROVINCES } from '../_data/indonesia-regions'
 import { useOnboardingStore } from '../_store/onboarding-store'
 
 const kontakSchema = z.object({
-  email: z.string().email('Email tidak valid'),
-  phone: z.string().min(10, 'No. telepon minimal 10 digit'),
+  email: z.union([z.literal(''), z.string().email('Email tidak valid')]),
+  phone: z
+    .string()
+    .refine(
+      (value) => value.length === 0 || value.length >= 10,
+      'No. telepon minimal 10 digit',
+    ),
   whatsapp: z.string().optional(),
-  address: z.string().min(10, 'Alamat minimal 10 karakter'),
-  province: z.string().min(1, 'Pilih provinsi'),
-  city: z.string().min(1, 'Pilih kota/kabupaten'),
-  postalCode: z.string().regex(/^\d{5}$/, 'Kode pos harus 5 digit angka'),
+  address: z.string(),
+  province: z.string(),
+  city: z.string(),
+  postalCode: z.union([
+    z.literal(''),
+    z.string().regex(/^\d{5}$/, 'Kode pos harus 5 digit angka'),
+  ]),
 })
 
 type KontakFormData = z.infer<typeof kontakSchema>
 
 export function KontakStep({ onComplete }: { onComplete: () => void }) {
   const { formData, updateField, markStepComplete } = useOnboardingStore()
+  const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<KontakFormData>({
     resolver: zodResolver(kontakSchema),
@@ -67,15 +77,29 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
   }, [selectedProvince, form])
 
   const onSubmit = (data: KontakFormData) => {
-    updateField('email', data.email)
-    updateField('phone', data.phone)
-    updateField('whatsapp', data.whatsapp || '')
-    updateField('address', data.address)
-    updateField('city', data.city)
-    updateField('province', data.province)
-    updateField('postalCode', data.postalCode)
-    markStepComplete(1)
-    onComplete()
+    setSubmitting(true)
+    echoPut('wizard/step/2', {
+      contact_email: data.email,
+      contact_phone: data.phone,
+      whatsapp_number: data.whatsapp || null,
+      address_line: data.address,
+      city: data.city,
+      province: data.province,
+      postal_code: data.postalCode,
+    })
+      .then(() => {
+        updateField('email', data.email)
+        updateField('phone', data.phone)
+        updateField('whatsapp', data.whatsapp || '')
+        updateField('address', data.address)
+        updateField('city', data.city)
+        updateField('province', data.province)
+        updateField('postalCode', data.postalCode)
+        markStepComplete(1)
+        onComplete()
+      })
+      .catch((error) => form.setError('root', { message: error.message }))
+      .finally(() => setSubmitting(false))
   }
 
   return (
@@ -97,7 +121,7 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email *</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
@@ -115,7 +139,7 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nomor Telepon *</FormLabel>
+                <FormLabel>Nomor Telepon</FormLabel>
                 <FormControl>
                   <Input placeholder="08123456789" {...field} />
                 </FormControl>
@@ -147,7 +171,7 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
                 field: ControllerRenderProps<KontakFormData, 'province'>
               }) => (
                 <FormItem>
-                  <FormLabel>Provinsi *</FormLabel>
+                  <FormLabel>Provinsi</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
@@ -180,7 +204,7 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
                 field: ControllerRenderProps<KontakFormData, 'city'>
               }) => (
                 <FormItem>
-                  <FormLabel>Kota/Kabupaten *</FormLabel>
+                  <FormLabel>Kota/Kabupaten</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
@@ -211,7 +235,7 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Alamat *</FormLabel>
+                <FormLabel>Alamat</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Jl. Contoh No. 123, Kota, Provinsi 12345"
@@ -234,7 +258,7 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
               field: ControllerRenderProps<KontakFormData, 'postalCode'>
             }) => (
               <FormItem>
-                <FormLabel>Kode Pos *</FormLabel>
+                <FormLabel>Kode Pos</FormLabel>
                 <FormControl>
                   <Input placeholder="12345" maxLength={5} {...field} />
                 </FormControl>
@@ -243,8 +267,13 @@ export function KontakStep({ onComplete }: { onComplete: () => void }) {
             )}
           />
 
-          <Button type="submit" className="w-full">
-            Lanjut ke Domain
+          {form.formState.errors.root && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.root.message}
+            </p>
+          )}
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? 'Menyimpan...' : 'Lanjut ke Domain'}
           </Button>
         </form>
       </Form>

@@ -15,15 +15,18 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { APP_CONFIG } from '@/config/app-config'
-import { rootUser } from '@/data/users'
 import { sidebarItems } from '@/navigation/sidebar/sidebar-items'
 import { usePreferencesStore } from '@/stores/preferences/preferences-provider'
+import type { EchoAccountState } from '@levelupid/types'
 
 import { NavMain } from './nav-main'
 import { NavUser } from './nav-user'
 import { SupportCard } from './support-card'
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: EchoAccountState['user'] }) {
   const { sidebarVariant, sidebarCollapsible, isSynced } = usePreferencesStore(
     useShallow((s) => ({
       sidebarVariant: s.values.sidebar_variant,
@@ -54,7 +57,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SupportCard />
-        <NavUser user={rootUser} />
+        <NavUser
+          user={{ name: user.full_name, email: user.email, avatar: '' }}
+        />
       </SidebarFooter>
     </Sidebar>
   )

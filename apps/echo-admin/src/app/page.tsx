@@ -1,9 +1,11 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export default async function RootPage() {
-  const cookieStore = await cookies()
-  const isOnboarded = cookieStore.get('echo_onboarded')?.value === 'true'
+import { getAccountState } from '@/lib/server/echo-api'
 
-  redirect(isOnboarded ? '/dashboard/default' : '/onboarding')
+export default async function RootPage() {
+  const account = await getAccountState()
+
+  if (!account) redirect('/auth/login')
+  if (account.next_screen === 'wizard') redirect('/onboarding')
+  redirect('/dashboard/default')
 }

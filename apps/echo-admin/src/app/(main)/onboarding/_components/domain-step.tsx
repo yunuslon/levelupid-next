@@ -17,6 +17,7 @@ import {
 } from '@levelupid/ui/components/form'
 import { Input } from '@levelupid/ui/components/input'
 
+import { echoGet, echoPut } from '@/lib/echo-client'
 import { useOnboardingStore } from '../_store/onboarding-store'
 
 const domainSchema = z.object({
@@ -33,6 +34,8 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
   const { formData, updateField, markStepComplete } = useOnboardingStore()
   const [checking, setChecking] = useState(false)
   const [available, setAvailable] = useState<boolean | null>(null)
+  const [domain, setDomain] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<DomainFormData>({
     resolver: zodResolver(domainSchema),
@@ -42,26 +45,51 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
   const subdomain = form.watch('subdomain')
 
   useEffect(() => {
+    let active = true
+
     if (!subdomain || subdomain.length < 3) {
       setAvailable(null)
+      setChecking(false)
       return
     }
 
-    const checkAvailability = async () => {
+    const timeout = window.setTimeout(async () => {
       setChecking(true)
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      setAvailable(true)
-      setChecking(false)
-    }
+      try {
+        const result = await echoGet<{ available: boolean; domain: string }>(
+          `wizard/subdomain-check?subdomain=${encodeURIComponent(subdomain)}`,
+        )
+        if (active) {
+          setAvailable(result.available)
+          setDomain(result.domain)
+        }
+      } catch {
+        if (active) {
+          setAvailable(false)
+          setDomain('')
+        }
+      } finally {
+        if (active) setChecking(false)
+      }
+    }, 350)
 
-    checkAvailability()
+    return () => {
+      active = false
+      window.clearTimeout(timeout)
+    }
   }, [subdomain])
 
   const onSubmit = (data: DomainFormData) => {
     if (!available) return
-    updateField('subdomain', data.subdomain)
-    markStepComplete(2)
-    onComplete()
+    setSubmitting(true)
+    echoPut('wizard/step/3', { subdomain: data.subdomain })
+      .then(() => {
+        updateField('subdomain', data.subdomain)
+        markStepComplete(2)
+        onComplete()
+      })
+      .catch((error) => form.setError('root', { message: error.message }))
+      .finally(() => setSubmitting(false))
   }
 
   return (
@@ -111,7 +139,7 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
                 <strong>URL Toko Anda:</strong>
               </p>
               <p className="mt-2 break-all font-mono text-base font-medium sm:text-lg">
-                https://{subdomain}.levelupid.com
+                https://{domain || `${subdomain}.alpha.test`}
               </p>
               {checking && (
                 <p className="mt-2 text-xs text-muted-foreground">
@@ -131,12 +159,17 @@ export function DomainStep({ onComplete }: { onComplete: () => void }) {
             </div>
           )}
 
+          {form.formState.errors.root && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.root.message}
+            </p>
+          )}
           <Button
             type="submit"
             className="w-full"
-            disabled={!available || checking}
+            disabled={!available || checking || submitting}
           >
-            Lanjut ke Tampilan
+            {submitting ? 'Menyimpan...' : 'Lanjut ke Tampilan'}
           </Button>
         </form>
       </Form>

@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -15,6 +16,7 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/toast'
+import { type EchoClientError, echoGet, echoPost } from '@/lib/echo-client'
 
 const formSchema = z.object({
   email: z.email({ message: 'Please enter a valid email address.' }),
@@ -24,14 +26,8 @@ const formSchema = z.object({
   remember: z.boolean().optional(),
 })
 
-const onSubmit = (data: z.infer<typeof formSchema>) => {
-  toast.add({
-    title: 'Login form submitted',
-    description: `Email: ${data.email}`,
-  })
-}
-
 export function LoginForm() {
+  const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,6 +36,29 @@ export function LoginForm() {
       remember: false,
     },
   })
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      await echoPost('auth/login', {
+        email: data.email,
+        password: data.password,
+      })
+      const account = await echoGet<{ next_screen: string }>('me')
+
+      if (account.next_screen === 'wizard') {
+        router.replace('/onboarding')
+      } else {
+        router.replace('/dashboard/default')
+      }
+      router.refresh()
+    } catch (error) {
+      const apiError = error as EchoClientError
+      toast.add({
+        title: 'Login gagal',
+        description: apiError.message,
+      })
+    }
+  }
 
   return (
     <form
@@ -108,8 +127,12 @@ export function LoginForm() {
           )}
         />
       </FieldGroup>
-      <Button className="w-full" type="submit">
-        Login
+      <Button
+        className="w-full"
+        type="submit"
+        disabled={form.formState.isSubmitting}
+      >
+        {form.formState.isSubmitting ? 'Memproses...' : 'Login'}
       </Button>
     </form>
   )

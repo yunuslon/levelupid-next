@@ -23,7 +23,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { echoPost } from '@/lib/echo-client'
 import { getInitials } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 export function NavUser({
   user,
@@ -34,7 +36,14 @@ export function NavUser({
     readonly avatar: string
   }
 }) {
+  const router = useRouter()
   const { isMobile } = useSidebar()
+
+  const handleLogout = async () => {
+    await echoPost('auth/logout')
+    router.replace('/auth/login')
+    router.refresh()
+  }
 
   return (
     <SidebarMenu>
@@ -98,7 +107,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

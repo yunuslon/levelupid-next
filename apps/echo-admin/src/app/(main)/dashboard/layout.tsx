@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 import { cn } from 'cn'
 
@@ -12,7 +13,9 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { users } from '@/data/users'
+import { getAccountState } from '@/lib/server/echo-api'
 import { getPreference } from '@/server/server-actions'
+import { AccountStateGate } from './_components/account-state-gate'
 
 import { AccountSwitcher } from './_components/header/account-switcher'
 import { GitHubRepositoriesMenu } from './_components/header/github-repositories-menu'
@@ -23,6 +26,10 @@ import { ThemeSwitcher } from './_components/header/theme-switcher'
 export default async function Layout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const account = await getAccountState()
+  if (!account) redirect('/auth/login')
+  if (account.next_screen === 'wizard') redirect('/onboarding')
+
   const cookieStore = await cookies()
   const defaultOpen = cookieStore.get('sidebar_state')?.value !== 'false'
   const [variant, collapsible] = await Promise.all([
@@ -39,7 +46,11 @@ export default async function Layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant={variant} collapsible={collapsible} />
+      <AppSidebar
+        variant={variant}
+        collapsible={collapsible}
+        user={account.user}
+      />
       <SidebarInset
         className={cn(
           '[html[data-content-layout=centered]_&>*]:mx-auto',
@@ -76,7 +87,7 @@ export default async function Layout({
         </header>
         {/* Pages can set data-content-padding="false" to render full-bleed app layouts. */}
         <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden p-4 has-data-[content-padding=false]:p-0 md:p-6 md:has-data-[content-padding=false]:p-0">
-          {children}
+          <AccountStateGate initialState={account}>{children}</AccountStateGate>
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -357,11 +357,14 @@
 
 #### 4.1 `apps/echo-admin` Tenant Setup
 
-- [ ] Onboarding wizard (first-time setup):
-  - [ ] Step 1: Store info (name, description)
-  - [ ] Step 2: Domain setup (custom domain input, DNS instructions)
-  - [ ] Step 3: Theme picker (Phase 5 detail)
-  - [ ] Complete → redirect ke dashboard
+- [x] Onboarding wizard (first-time setup):
+  - [x] Step 1: Store info (name, description)
+  - [x] Step 2: Domain setup (custom domain input, DNS instructions)
+  - [x] Step 3: Theme picker (Phase 5 detail)
+  - [x] Complete → redirect ke dashboard/provisioning state
+- [x] Integrate tenant auth login, refresh, logout, and account-state routing
+- [x] Integrate wizard state, options, subdomain check, step saves, and finish
+- [x] Add provisioning blocking state with 8-second polling
 - [ ] Product management:
   - [ ] List page: TanStack Table
   - [ ] Create/edit form: name, description, price, images, category, stock

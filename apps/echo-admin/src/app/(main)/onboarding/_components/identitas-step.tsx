@@ -1,9 +1,11 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import type { EchoWizardOptions } from '@levelupid/types'
 import { Button } from '@levelupid/ui/components/button'
 import {
   Form,
@@ -24,29 +26,24 @@ import {
 } from '@levelupid/ui/components/select'
 import { Textarea } from '@levelupid/ui/components/textarea'
 
+import { echoPut } from '@/lib/echo-client'
 import { useOnboardingStore } from '../_store/onboarding-store'
 
 const identitasSchema = z.object({
   storeName: z.string().min(3, 'Nama toko minimal 3 karakter'),
-  businessCategory: z.string().min(1, 'Pilih kategori usaha'),
+  businessCategory: z.string(),
   description: z.string().max(500).optional(),
   tagline: z.string().max(100).optional(),
 })
 
 type IdentitasFormData = z.infer<typeof identitasSchema>
 
-const BUSINESS_CATEGORIES = [
-  { value: 'fashion', label: 'Fashion & Apparel' },
-  { value: 'food', label: 'Food & Beverage' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'home', label: 'Home & Garden' },
-  { value: 'beauty', label: 'Beauty & Personal Care' },
-  { value: 'automotive', label: 'Automotive' },
-  { value: 'other', label: 'Lainnya' },
-]
-
-export function IdentitasStep({ onComplete }: { onComplete: () => void }) {
+export function IdentitasStep({
+  onComplete,
+  options,
+}: { onComplete: () => void; options: EchoWizardOptions }) {
   const { formData, updateField, markStepComplete } = useOnboardingStore()
+  const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<IdentitasFormData>({
     resolver: zodResolver(identitasSchema),
@@ -59,12 +56,25 @@ export function IdentitasStep({ onComplete }: { onComplete: () => void }) {
   })
 
   const onSubmit = (data: IdentitasFormData) => {
-    updateField('storeName', data.storeName)
-    updateField('businessCategory', data.businessCategory)
-    updateField('description', data.description || '')
-    updateField('tagline', data.tagline || '')
-    markStepComplete(0)
-    onComplete()
+    setSubmitting(true)
+    echoPut('wizard/step/1', {
+      store_name: data.storeName,
+      ...(data.businessCategory
+        ? { category_id: Number(data.businessCategory) }
+        : {}),
+      description: data.description || null,
+      tagline: data.tagline || null,
+    })
+      .then(() => {
+        updateField('storeName', data.storeName)
+        updateField('businessCategory', data.businessCategory)
+        updateField('description', data.description || '')
+        updateField('tagline', data.tagline || '')
+        markStepComplete(0)
+        onComplete()
+      })
+      .catch((error) => form.setError('root', { message: error.message }))
+      .finally(() => setSubmitting(false))
   }
 
   return (
@@ -100,11 +110,14 @@ export function IdentitasStep({ onComplete }: { onComplete: () => void }) {
             name="businessCategory"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Kategori Usaha *</FormLabel>
+                <FormLabel>Kategori Usaha</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value}
-                  items={BUSINESS_CATEGORIES}
+                  items={options.categories.map((category) => ({
+                    value: String(category.id),
+                    label: category.name,
+                  }))}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -112,9 +125,9 @@ export function IdentitasStep({ onComplete }: { onComplete: () => void }) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="min-w-3xs p-2">
-                    {BUSINESS_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
+                    {options.categories.map((category) => (
+                      <SelectItem key={category.id} value={String(category.id)}>
+                        {category.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -164,8 +177,13 @@ export function IdentitasStep({ onComplete }: { onComplete: () => void }) {
             )}
           />
 
-          <Button type="submit" className="w-full">
-            Lanjut ke Kontak
+          {form.formState.errors.root && (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.root.message}
+            </p>
+          )}
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? 'Menyimpan...' : 'Lanjut ke Kontak'}
           </Button>
         </form>
       </Form>
